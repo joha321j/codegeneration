@@ -1,0 +1,834 @@
+type Query {
+  """
+  Gets OData EDMX metadata describing the event data model
+  
+  Equivalent to GET /apps/{appId}/events/$metadata
+  """
+  appEventsMetadata(
+    """
+    ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
+    """
+    appId: String!
+  ): String
+
+  """
+  Gets metadata describing the available metrics
+  
+  Equivalent to GET /apps/{appId}/metrics/metadata
+  """
+  appMetricsMetadata(
+    """
+    ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
+    """
+    appId: String!
+  ): JSON
+
+  """
+  Gets the data for a single event
+  
+  Equivalent to GET /apps/{appId}/events/{eventType}/{eventId}
+  """
+  eventsGet(
+    """
+    ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
+    """
+    appId: String!
+
+    """ID of event."""
+    eventId: String!
+
+    """
+    The type of events to query; either a standard event type (`traces`, `customEvents`, `pageViews`, `requests`, `dependencies`, `exceptions`, `availabilityResults`) or `$all` to query across all event types.
+    """
+    eventType: EventType2!
+
+    """
+    Optional. The timespan over which to retrieve events. This is an ISO8601 time period value.  This timespan is applied in addition to any that are specified in the Odata expression.
+    """
+    timespan: String
+  ): EventsResults
+
+  """
+  Executes an OData query for events
+  
+  Equivalent to GET /apps/{appId}/events/{eventType}
+  """
+  eventsResults(
+    """
+    ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
+    """
+    appId: String!
+
+    """An expression used for aggregation over returned events"""
+    apply: String
+
+    """Request a count of matching items included with the returned events"""
+    count: Boolean
+
+    """
+    The type of events to query; either a standard event type (`traces`, `customEvents`, `pageViews`, `requests`, `dependencies`, `exceptions`, `availabilityResults`) or `$all` to query across all event types.
+    """
+    eventType: EventType2!
+
+    """An expression used to filter the returned events"""
+    filter: String
+
+    """Format for the returned events"""
+    format: String
+
+    """
+    A comma-separated list of properties with \"asc\" (the default) or \"desc\" to control the order of returned events
+    """
+    orderby: String
+
+    """
+    A free-text search expression to match for whether a particular event should be returned
+    """
+    search: String
+
+    """Limits the properties to just those requested on each returned event"""
+    select: String
+
+    """The number of items to skip over before returning events"""
+    skip: Int
+
+    """
+    Optional. The timespan over which to retrieve events. This is an ISO8601 time period value.  This timespan is applied in addition to any that are specified in the Odata expression.
+    """
+    timespan: String
+
+    """The number of events to return"""
+    top: Int
+  ): EventsResults
+
+  """
+  Retrieve the metadata information for the app, including its schema, etc.
+  
+  Equivalent to GET /apps/{appId}/metadata
+  """
+  metadataResults(
+    """
+    ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
+    """
+    appId: String!
+  ): MetadataResults
+
+  """
+  Gets metric values for a single metric
+  
+  Equivalent to GET /apps/{appId}/metrics/{metricId}
+  """
+  metricsResult(
+    """
+    The aggregation to use when computing the metric values. To retrieve more than one aggregation at a time, separate them with a comma. If no aggregation is specified, then the default aggregation for the metric is used.
+    """
+    aggregation: [AggregationListItem]
+
+    """
+    ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
+    """
+    appId: String!
+
+    """
+    An expression used to filter the results.  This value should be a valid OData filter expression where the keys of each clause should be applicable dimensions for the metric you are retrieving.
+    """
+    filter: String
+
+    """
+    The time interval to use when retrieving metric values. This is an ISO8601 duration. If interval is omitted, the metric value is aggregated across the entire timespan. If interval is supplied, the server may adjust the interval to a more appropriate size based on the timespan used for the query. In all cases, the actual interval used for the query is included in the response.
+    """
+    interval: String
+
+    """
+    ID of the metric. This is either a standard AI metric, or an application-specific custom metric.
+    """
+    metricId: MetricId2!
+
+    """
+    The aggregation function and direction to sort the segments by.  This value is only valid when segment is specified.
+    """
+    orderby: String
+
+    """
+    The name of the dimension to segment the metric values by. This dimension must be applicable to the metric you are retrieving. To segment by more than one dimension at a time, separate them with a comma (,). In this case, the metric data will be segmented in the order the dimensions are listed in the parameter.
+    """
+    segment: [SegmentListItem]
+
+    """
+    The timespan over which to retrieve metric values. This is an ISO8601 time period value. If timespan is omitted, a default time range of `PT12H` ("last 12 hours") is used. The actual timespan that is queried may be adjusted by the server based. In all cases, the actual time span used for the query is included in the response.
+    """
+    timespan: String
+
+    """
+    The number of segments to return.  This value is only valid when segment is specified.
+    """
+    top: Int
+  ): MetricsResult
+
+  """
+  Executes an Analytics query for data
+  
+  Equivalent to GET /apps/{appId}/query
+  """
+  queryResults(
+    """
+    ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
+    """
+    appId: String!
+
+    """
+    The Analytics query. Learn more about the [Analytics query syntax](https://azure.microsoft.com/documentation/articles/app-insights-analytics-reference/)
+    """
+    query: String!
+
+    """
+    Optional. The timespan over which to query data. This is an ISO8601 time period value.  This timespan is applied in addition to any that are specified in the query expression.
+    """
+    timespan: String
+  ): QueryResults
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
+
+"""An events query result."""
+type EventsResults {
+  """OData messages for this response."""
+  aiMessages: [ErrorInfo]
+
+  """OData context metadata endpoint for this response"""
+  odataContext: String
+
+  """Contents of the events query result."""
+  value: [EventsResultData]
+}
+
+type ErrorInfo {
+  additionalProperties: JSON
+
+  """A machine readable error code."""
+  code: String!
+
+  """error details."""
+  details: [ErrorDetail]
+  innererror: ErrorInfo
+
+  """A human readable error message."""
+  message: String!
+}
+
+type ErrorDetail {
+  additionalProperties: JSON
+
+  """The error's code."""
+  code: String!
+
+  """A human readable error message."""
+  message: String!
+
+  """Indicates resources which were responsible for the error."""
+  resources: [String]
+
+  """Indicates which property in the request is responsible for the error."""
+  target: String
+
+  """Indicates which value in 'target' is responsible for the error."""
+  value: String
+}
+
+"""Events query result data."""
+type EventsResultData {
+  """AI related application info for an event result"""
+  ai: EventsAiInfo
+
+  """Application info for an event result"""
+  application: EventsApplicationInfo
+
+  """Client info for an event result"""
+  client: EventsClientInfo
+
+  """Cloud info for an event result"""
+  cloud: EventsCloudInfo
+
+  """Count of the event"""
+  count: BigInt
+
+  """Custom dimensions of the event"""
+  customDimensions: JSON
+
+  """Custom measurements of the event"""
+  customMeasurements: JSON
+
+  """The unique ID for this event."""
+  id: String
+
+  """Operation info for an event result"""
+  operation: EventsOperationInfo
+
+  """Session info for an event result"""
+  session: EventsSessionInfo
+
+  """Timestamp of the event"""
+  timestamp: String
+
+  """
+  The type of events to query; either a standard event type (`traces`, `customEvents`, `pageViews`, `requests`, `dependencies`, `exceptions`, `availabilityResults`) or `$all` to query across all event types.
+  """
+  type: EventType!
+
+  """User info for an event result"""
+  user: EventsUserInfo
+}
+
+"""AI related application info for an event result"""
+type EventsAiInfo {
+  """ID of the application"""
+  appId: String
+
+  """Name of the application"""
+  appName: String
+
+  """iKey of the app"""
+  iKey: String
+
+  """SDK version of the application"""
+  sdkVersion: String
+}
+
+"""Application info for an event result"""
+type EventsApplicationInfo {
+  """Version of the application"""
+  version: String
+}
+
+"""Client info for an event result"""
+type EventsClientInfo {
+  """Browser of the client"""
+  browser: String
+
+  """City of the client"""
+  city: String
+
+  """Country or region of the client"""
+  countryOrRegion: String
+
+  """IP address of the client"""
+  ip: String
+
+  """Model of the client"""
+  model: String
+
+  """Operating system of the client"""
+  os: String
+
+  """State or province of the client"""
+  stateOrProvince: String
+
+  """Type of the client"""
+  type: String
+}
+
+"""Cloud info for an event result"""
+type EventsCloudInfo {
+  """Role instance of the cloud"""
+  roleInstance: String
+
+  """Role name of the cloud"""
+  roleName: String
+}
+
+"""
+The `BigInt` scalar type represents non-fractional signed whole numeric values.
+"""
+scalar BigInt
+
+"""Operation info for an event result"""
+type EventsOperationInfo {
+  """ID of the operation"""
+  id: String
+
+  """Name of the operation"""
+  name: String
+
+  """Parent ID of the operation"""
+  parentId: String
+
+  """Synthetic source of the operation"""
+  syntheticSource: String
+}
+
+"""Session info for an event result"""
+type EventsSessionInfo {
+  """ID of the session"""
+  id: String
+}
+
+enum EventType {
+  _ALL
+  TRACES
+  CUSTOMEVENTS
+  PAGEVIEWS
+  BROWSERTIMINGS
+  REQUESTS
+  DEPENDENCIES
+  EXCEPTIONS
+  AVAILABILITYRESULTS
+  PERFORMANCECOUNTERS
+  CUSTOMMETRICS
+}
+
+"""User info for an event result"""
+type EventsUserInfo {
+  """Account ID of the user"""
+  accountId: String
+
+  """Authenticated ID of the user"""
+  authenticatedId: String
+
+  """ID of the user"""
+  id: String
+}
+
+enum EventType2 {
+  _ALL
+  TRACES
+  CUSTOMEVENTS
+  PAGEVIEWS
+  BROWSERTIMINGS
+  REQUESTS
+  DEPENDENCIES
+  EXCEPTIONS
+  AVAILABILITYRESULTS
+  PERFORMANCECOUNTERS
+  CUSTOMMETRICS
+}
+
+"""The metadata result for the app, including available tables, etc."""
+type MetadataResults {
+  """
+  The list of Application Insights apps that were referenced in the metadata request.
+  """
+  applications: [MetadataApplication]
+
+  """The list of functions stored on the app."""
+  functions: [MetadataFunction]
+
+  """The list of groups of tables on the app."""
+  tableGroups: [MetadataTableGroup]
+
+  """The list of tables and columns that comprise the schema of the app."""
+  tables: [MetadataTable]
+}
+
+"""
+Application Insights apps that were part of the metadata request and that the user has access to.
+"""
+type MetadataApplication {
+  """The list of stored functions on the Application Insights app"""
+  functions: [String]
+
+  """The ID of the Application Insights app."""
+  id: String!
+
+  """The name of the Application Insights app."""
+  name: String!
+
+  """The Azure region of the Application Insights app."""
+  region: String!
+
+  """The ARM resource ID of the Application Insights app."""
+  resourceId: String!
+
+  """The list of table groups on the Application Insights app"""
+  tableGroups: [String]
+
+  """The list of custom tables for the Application Insights app."""
+  tables: [String]
+}
+
+"""
+Functions are stored Kusto queries that can be specified as part of queries by using their name.
+"""
+type MetadataFunction {
+  """The KQL body of the function."""
+  body: String!
+
+  """The description of the function."""
+  description: String
+
+  """The display name of the function."""
+  displayName: String
+
+  """The ID of the function."""
+  id: String!
+
+  """The name of the function, to be used in queries."""
+  name: String!
+
+  """The parameters/arguments of the function, if any."""
+  parameters: String
+}
+
+"""
+The table grouping can be either an Application Insights schema or a Log Analytics solution.
+"""
+type MetadataTableGroup {
+  """The description of the table group"""
+  description: String
+
+  """The display name of the table group"""
+  displayName: String
+
+  """The ID of the table group"""
+  id: String!
+
+  """The name of the table group"""
+  name: String!
+
+  """
+  The source of the table group, can be either AI or OMS for Log Analytics workspaces
+  """
+  source: String
+
+  """The list of tables contained in the table group"""
+  tables: [String]
+}
+
+"""
+Tables are part of the app schema, and contain a list of columns and a reference to other relevant metadata items.
+"""
+type MetadataTable {
+  """The list of columns defined on the table"""
+  columns: [Columns2ListItem]
+
+  """The description of the table"""
+  description: String
+
+  """The ID of the table"""
+  id: String!
+
+  """The name of the table"""
+  name: String!
+
+  """The column associated with the timespan query parameter for the table"""
+  timespanColumn: String
+}
+
+type Columns2ListItem {
+  """The description of the column"""
+  description: String
+
+  """A flag indicating this column is a preferred facet"""
+  isPreferredFacet: Boolean
+
+  """The name of the column"""
+  name: String!
+
+  """
+  an indication of the source of the column, used only when multiple apps have conflicting definition for the column
+  """
+  source: JSON
+
+  """The data type of the column"""
+  type: Type!
+}
+
+enum Type {
+  BOOL
+  DATETIME
+  DYNAMIC
+  INT
+  LONG
+  REAL
+  STRING
+}
+
+"""A metric result."""
+type MetricsResult {
+  """A metric result data."""
+  value: JSON
+}
+
+enum AggregationListItem {
+  MIN
+  MAX
+  AVG
+  SUM
+  COUNT
+  UNIQUE
+}
+
+enum MetricId2 {
+  REQUESTS_COUNT
+  REQUESTS_DURATION
+  REQUESTS_FAILED
+  USERS_COUNT
+  USERS_AUTHENTICATED
+  PAGEVIEWS_COUNT
+  PAGEVIEWS_DURATION
+  CLIENT_PROCESSINGDURATION
+  CLIENT_RECEIVEDURATION
+  CLIENT_NETWORKDURATION
+  CLIENT_SENDDURATION
+  CLIENT_TOTALDURATION
+  DEPENDENCIES_COUNT
+  DEPENDENCIES_FAILED
+  DEPENDENCIES_DURATION
+  EXCEPTIONS_COUNT
+  EXCEPTIONS_BROWSER
+  EXCEPTIONS_SERVER
+  SESSIONS_COUNT
+  PERFORMANCECOUNTERS_REQUESTEXECUTIONTIME
+  PERFORMANCECOUNTERS_REQUESTSPERSECOND
+  PERFORMANCECOUNTERS_REQUESTSINQUEUE
+  PERFORMANCECOUNTERS_MEMORYAVAILABLEBYTES
+  PERFORMANCECOUNTERS_EXCEPTIONSPERSECOND
+  PERFORMANCECOUNTERS_PROCESSCPUPERCENTAGE
+  PERFORMANCECOUNTERS_PROCESSIOBYTESPERSECOND
+  PERFORMANCECOUNTERS_PROCESSPRIVATEBYTES
+  PERFORMANCECOUNTERS_PROCESSORCPUPERCENTAGE
+  AVAILABILITYRESULTS_AVAILABILITYPERCENTAGE
+  AVAILABILITYRESULTS_DURATION
+  BILLING_TELEMETRYCOUNT
+  CUSTOMEVENTS_COUNT
+}
+
+enum SegmentListItem {
+  APPLICATIONBUILD
+  APPLICATIONVERSION
+  AUTHENTICATEDORANONYMOUSTRAFFIC
+  BROWSER
+  BROWSERVERSION
+  CITY
+  CLOUDROLENAME
+  CLOUDSERVICENAME
+  CONTINENT
+  COUNTRYORREGION
+  DEPLOYMENTID
+  DEPLOYMENTUNIT
+  DEVICETYPE
+  ENVIRONMENT
+  HOSTINGLOCATION
+  INSTANCENAME
+}
+
+"""Contains the tables, columns & rows resulting from a query."""
+type QueryResults {
+  """The list of tables, columns and rows."""
+  tables: [Table]!
+}
+
+"""Contains the columns and rows for one table in a query response."""
+type Table {
+  """The list of columns in this table."""
+  columns: [Column]!
+
+  """The name of the table."""
+  name: String!
+
+  """The resulting rows from this query."""
+  rows: [[String]]!
+}
+
+"""A column in a table."""
+type Column {
+  """The name of this column."""
+  name: String
+
+  """The data type of this column."""
+  type: String
+}
+
+type Mutation {
+  """
+  Retrieve the metadata information for the app, including its schema, etc.
+  
+  Equivalent to POST /apps/{appId}/metadata
+  """
+  metadataPost(
+    """
+    ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
+    """
+    appId: String!
+  ): MetadataResults
+
+  """
+  Gets metric values for multiple metrics
+  
+  Equivalent to POST /apps/{appId}/metrics
+  """
+  metricsGetMultiple(
+    """
+    ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
+    """
+    appId: String!
+
+    """Metrics request body"""
+    metricsPostBodyInput: [MetricsPostBodySchemaInput]!
+  ): [MetricsResultsListItem]
+
+  """
+  Executes an Analytics query for data. [Here](https://dev.applicationinsights.io/documentation/Using-the-API/Query) is an example for using POST with an Analytics query.
+  
+  Equivalent to POST /apps/{appId}/query
+  """
+  queryExecute(
+    """
+    ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
+    """
+    appId: String!
+
+    """
+    The Analytics query. Learn more about the [Analytics query syntax](https://azure.microsoft.com/documentation/articles/app-insights-analytics-reference/)
+    """
+    queryBodyInput: QueryBodyInput!
+  ): QueryResults
+}
+
+type MetricsResultsListItem {
+  """A metric result."""
+  body: MetricsResult!
+
+  """The specified ID for this metric."""
+  id: String!
+
+  """The HTTP status code of this metric query."""
+  status: Int!
+}
+
+"""A metric request"""
+input MetricsPostBodySchemaInput {
+  """
+  An identifier for this query.  Must be unique within the post body of the request.  This identifier will be the 'id' property of the response object representing this query.
+  """
+  id: String!
+
+  """The parameters for a single metrics query"""
+  parameters: ParametersInput!
+}
+
+"""The parameters for a single metrics query"""
+input ParametersInput {
+  """
+  The aggregation to use when computing the metric values. To retrieve more than one aggregation at a time, separate them with a comma. If no aggregation is specified, then the default aggregation for the metric is used.
+  """
+  aggregation: [MetricsAggregationListItem]
+
+  """
+  An expression used to filter the results.  This value should be a valid OData filter expression where the keys of each clause should be applicable dimensions for the metric you are retrieving.
+  """
+  filter: String
+
+  """
+  The time interval to use when retrieving metric values. This is an ISO8601 duration. If interval is omitted, the metric value is aggregated across the entire timespan. If interval is supplied, the server may adjust the interval to a more appropriate size based on the timespan used for the query. In all cases, the actual interval used for the query is included in the response.
+  """
+  interval: String
+
+  """
+  ID of the metric. This is either a standard AI metric, or an application-specific custom metric.
+  """
+  metricId: MetricId!
+
+  """
+  The aggregation function and direction to sort the segments by.  This value is only valid when segment is specified.
+  """
+  orderby: String
+
+  """
+  The name of the dimension to segment the metric values by. This dimension must be applicable to the metric you are retrieving. To segment by more than one dimension at a time, separate them with a comma (,). In this case, the metric data will be segmented in the order the dimensions are listed in the parameter.
+  """
+  segment: [MetricsSegmentListItem]
+
+  """
+  The timespan over which to retrieve metric values. This is an ISO8601 time period value. If timespan is omitted, a default time range of `PT12H` ("last 12 hours") is used. The actual timespan that is queried may be adjusted by the server based. In all cases, the actual time span used for the query is included in the response.
+  """
+  timespan: String
+
+  """
+  The number of segments to return.  This value is only valid when segment is specified.
+  """
+  top: Int
+}
+
+enum MetricsAggregationListItem {
+  MIN
+  MAX
+  AVG
+  SUM
+  COUNT
+  UNIQUE
+}
+
+enum MetricId {
+  REQUESTS_COUNT
+  REQUESTS_DURATION
+  REQUESTS_FAILED
+  USERS_COUNT
+  USERS_AUTHENTICATED
+  PAGEVIEWS_COUNT
+  PAGEVIEWS_DURATION
+  CLIENT_PROCESSINGDURATION
+  CLIENT_RECEIVEDURATION
+  CLIENT_NETWORKDURATION
+  CLIENT_SENDDURATION
+  CLIENT_TOTALDURATION
+  DEPENDENCIES_COUNT
+  DEPENDENCIES_FAILED
+  DEPENDENCIES_DURATION
+  EXCEPTIONS_COUNT
+  EXCEPTIONS_BROWSER
+  EXCEPTIONS_SERVER
+  SESSIONS_COUNT
+  PERFORMANCECOUNTERS_REQUESTEXECUTIONTIME
+  PERFORMANCECOUNTERS_REQUESTSPERSECOND
+  PERFORMANCECOUNTERS_REQUESTSINQUEUE
+  PERFORMANCECOUNTERS_MEMORYAVAILABLEBYTES
+  PERFORMANCECOUNTERS_EXCEPTIONSPERSECOND
+  PERFORMANCECOUNTERS_PROCESSCPUPERCENTAGE
+  PERFORMANCECOUNTERS_PROCESSIOBYTESPERSECOND
+  PERFORMANCECOUNTERS_PROCESSPRIVATEBYTES
+  PERFORMANCECOUNTERS_PROCESSORCPUPERCENTAGE
+  AVAILABILITYRESULTS_AVAILABILITYPERCENTAGE
+  AVAILABILITYRESULTS_DURATION
+  BILLING_TELEMETRYCOUNT
+  CUSTOMEVENTS_COUNT
+}
+
+enum MetricsSegmentListItem {
+  APPLICATIONBUILD
+  APPLICATIONVERSION
+  AUTHENTICATEDORANONYMOUSTRAFFIC
+  BROWSER
+  BROWSERVERSION
+  CITY
+  CLOUDROLENAME
+  CLOUDSERVICENAME
+  CONTINENT
+  COUNTRYORREGION
+  DEPLOYMENTID
+  DEPLOYMENTUNIT
+  DEVICETYPE
+  ENVIRONMENT
+  HOSTINGLOCATION
+  INSTANCENAME
+}
+
+"""
+The Analytics query. Learn more about the [Analytics query syntax](https://azure.microsoft.com/documentation/articles/app-insights-analytics-reference/)
+"""
+input QueryBodyInput {
+  """Application IDs to include in cross-application queries."""
+  applications: [String]
+
+  """
+  The Analytics query. Learn more about the [Analytics query syntax](https://azure.microsoft.com/documentation/articles/app-insights-analytics-reference/)
+  """
+  query: String!
+
+  """
+  Optional. The timespan over which to query data. This is an ISO8601 time period value.  This timespan is applied in addition to any that are specified in the query expression.
+  """
+  timespan: String
+}

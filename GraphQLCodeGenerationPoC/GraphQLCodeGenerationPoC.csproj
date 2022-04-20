@@ -12,8 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GraphQLGeneration\GraphQLGeneration.csproj" OutputItemType="Analyzer" 
-                        ReferenceOutputAssembly="false"/>
+      <ProjectReference Include="..\GraphQLGeneration\GraphQLGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
 </Project>

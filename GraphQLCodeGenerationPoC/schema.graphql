@@ -1,0 +1,27 @@
+﻿schema {
+    query: Query
+}
+
+scalar Any
+
+type Query {
+    fetchFromAzure : Azure
+}
+
+type Azure {
+    """
+    Gets metric values for a single metric
+
+    Equivalent to GET /apps/{appId}/metrics/{metricId}
+    """
+    metricsResult(
+        appId: String!
+        data: String
+    ): MetricsResult
+}
+
+"""A metric result."""
+type MetricsResult {
+    """A metric result data."""
+    value: Any
+}
